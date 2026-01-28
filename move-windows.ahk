@@ -22,15 +22,11 @@ return
 
 ; Function to move window to next monitor
 MoveWindowToNextMonitor() {
-    WinGetActiveTitle, activeTitle
-    WinGet, activeWinId, ID, %activeTitle%
+    WinGet, activeWinId, ID, A
     
     if (!activeWinId) {
         return
     }
-    
-    ; Get current window position
-    WinGetPos, winX, winY, winWidth, winHeight, ahk_id %activeWinId%
     
     ; Get monitor information
     SysGet, monitorCount, MonitorCount
@@ -45,49 +41,17 @@ MoveWindowToNextMonitor() {
     ; Calculate next monitor (wrap around)
     nextMonitor := Mod(currentMonitor, monitorCount) + 1
     
-    ; Get the work area of the next monitor
-    SysGet, mon, MonitorWorkArea, %nextMonitor%
-    
-    ; Calculate new position (try to maintain relative position)
-    SysGet, currentMon, MonitorWorkArea, %currentMonitor%
-    
-    ; Calculate relative position within current monitor
-    relativeX := (winX - currentMonLeft) / (currentMonRight - currentMonLeft)
-    relativeY := (winY - currentMonTop) / (currentMonBottom - currentMonTop)
-    
-    ; Calculate new position on next monitor
-    newX := monLeft + (relativeX * (monRight - monLeft))
-    newY := monTop + (relativeY * (monBottom - monTop))
-    
-    ; Ensure window fits on the new monitor
-    if (newX + winWidth > monRight) {
-        newX := monRight - winWidth
-    }
-    if (newY + winHeight > monBottom) {
-        newY := monBottom - winHeight
-    }
-    if (newX < monLeft) {
-        newX := monLeft
-    }
-    if (newY < monTop) {
-        newY := monTop
-    }
-    
-    ; Move the window
-    WinMove, ahk_id %activeWinId%, , %newX%, %newY%
+    ; Move window to target monitor
+    MoveWindowToMonitor(activeWinId, currentMonitor, nextMonitor)
 }
 
 ; Function to move window to previous monitor
 MoveWindowToPreviousMonitor() {
-    WinGetActiveTitle, activeTitle
-    WinGet, activeWinId, ID, %activeTitle%
+    WinGet, activeWinId, ID, A
     
     if (!activeWinId) {
         return
     }
-    
-    ; Get current window position
-    WinGetPos, winX, winY, winWidth, winHeight, ahk_id %activeWinId%
     
     ; Get monitor information
     SysGet, monitorCount, MonitorCount
@@ -105,17 +69,37 @@ MoveWindowToPreviousMonitor() {
         previousMonitor := monitorCount
     }
     
-    ; Get the work area of the previous monitor
-    SysGet, mon, MonitorWorkArea, %previousMonitor%
+    ; Move window to target monitor
+    MoveWindowToMonitor(activeWinId, currentMonitor, previousMonitor)
+}
+
+; Helper function to move window to a specific monitor
+MoveWindowToMonitor(winId, currentMonitor, targetMonitor) {
+    ; Get current window position
+    WinGetPos, winX, winY, winWidth, winHeight, ahk_id %winId%
     
-    ; Calculate new position (try to maintain relative position)
+    ; Get the work area of the target monitor
+    SysGet, mon, MonitorWorkArea, %targetMonitor%
+    
+    ; Get the work area of the current monitor
     SysGet, currentMon, MonitorWorkArea, %currentMonitor%
     
     ; Calculate relative position within current monitor
-    relativeX := (winX - currentMonLeft) / (currentMonRight - currentMonLeft)
-    relativeY := (winY - currentMonTop) / (currentMonBottom - currentMonTop)
+    currentMonWidth := currentMonRight - currentMonLeft
+    currentMonHeight := currentMonBottom - currentMonTop
     
-    ; Calculate new position on previous monitor
+    ; Check for zero dimensions to avoid division by zero
+    if (currentMonWidth = 0) {
+        currentMonWidth := 1
+    }
+    if (currentMonHeight = 0) {
+        currentMonHeight := 1
+    }
+    
+    relativeX := (winX - currentMonLeft) / currentMonWidth
+    relativeY := (winY - currentMonTop) / currentMonHeight
+    
+    ; Calculate new position on target monitor
     newX := monLeft + (relativeX * (monRight - monLeft))
     newY := monTop + (relativeY * (monBottom - monTop))
     
@@ -134,7 +118,7 @@ MoveWindowToPreviousMonitor() {
     }
     
     ; Move the window
-    WinMove, ahk_id %activeWinId%, , %newX%, %newY%
+    WinMove, ahk_id %winId%, , %newX%, %newY%
 }
 
 ; Helper function to determine which monitor a window is on
