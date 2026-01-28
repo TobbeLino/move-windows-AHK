@@ -1,0 +1,16 @@
+# AutoHotKey compiled executables
+*.exe
+
+# Temporary files
+*.tmp
+*.bak
+*~
+
+# OS files
+Thumbs.db
+.DS_Store
+
+# Editor files
+.vscode/
+.idea/
+*.sublime-*
