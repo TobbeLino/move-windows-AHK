@@ -79,7 +79,7 @@ MoveWindowToMonitor(winId, currentMonitor, targetMonitor) {
     WinGetPos, winX, winY, winWidth, winHeight, ahk_id %winId%
     
     ; Get the work area of the target monitor
-    SysGet, mon, MonitorWorkArea, %targetMonitor%
+    SysGet, targetMon, MonitorWorkArea, %targetMonitor%
     
     ; Get the work area of the current monitor
     SysGet, currentMon, MonitorWorkArea, %currentMonitor%
@@ -100,21 +100,21 @@ MoveWindowToMonitor(winId, currentMonitor, targetMonitor) {
     relativeY := (winY - currentMonTop) / currentMonHeight
     
     ; Calculate new position on target monitor
-    newX := monLeft + (relativeX * (monRight - monLeft))
-    newY := monTop + (relativeY * (monBottom - monTop))
+    newX := targetMonLeft + (relativeX * (targetMonRight - targetMonLeft))
+    newY := targetMonTop + (relativeY * (targetMonBottom - targetMonTop))
     
     ; Ensure window fits on the new monitor
-    if (newX + winWidth > monRight) {
-        newX := monRight - winWidth
+    if (newX + winWidth > targetMonRight) {
+        newX := targetMonRight - winWidth
     }
-    if (newY + winHeight > monBottom) {
-        newY := monBottom - winHeight
+    if (newY + winHeight > targetMonBottom) {
+        newY := targetMonBottom - winHeight
     }
-    if (newX < monLeft) {
-        newX := monLeft
+    if (newX < targetMonLeft) {
+        newX := targetMonLeft
     }
-    if (newY < monTop) {
-        newY := monTop
+    if (newY < targetMonTop) {
+        newY := targetMonTop
     }
     
     ; Move the window
