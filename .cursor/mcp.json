@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "repo-search": {
+      "command": "node",
+      "args": ["~/mcp/mcp-ripgrep/dist/index.js"]
+    },
+    "fs-inspector": {
+      "command": "npx",
+      "args": ["@modelcontextprotocol/server-filesystem"]
+    }
+  }
+}
